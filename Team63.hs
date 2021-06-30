@@ -68,7 +68,7 @@ getDataFromCache stringAddress [] "fullyAssoc" _ = NoOutput
 getDataFromCache stringAddress cache "fullyAssoc" bitsNum = getDataFromCacheHelper (read stringAddress :: Int) cache "fullyAssoc" bitsNum 0
 
 
-getDataFromCache stringAddress cache "setAssoc" bitsNum = getDataFromCacheS (extractTag stringAddress bitsNum) (splitEvery (div (length cache) 2^bitsNum) cache) (convertBinToDec (read (lastN (fromIntegral bitsNum) stringAddress) :: Int))
+getDataFromCache stringAddress cache "setAssoc" bitsNum = getDataFromCacheS (extractTag stringAddress bitsNum) (splitEvery (div (length cache) 2^bitsNum) cache) (convertBinToDec (read (extractLastN (fromIntegral bitsNum) stringAddress) :: Int))
 
 getDataFromCacheS tag newCache index = getDataFromCacheSH (read tag :: Int) (newCache!!index) 0
 
@@ -114,14 +114,14 @@ extractTag stringAddress bitsNum
     |bitsNum > 0 = extractTag (init stringAddress) (bitsNum - 1)
     |otherwise = stringAddress
 
-zipLeftover :: [a] -> [a] -> [a]
-zipLeftover []     []     = []
-zipLeftover xs     []     = xs
-zipLeftover []     ys     = ys
-zipLeftover (x:xs) (y:ys) = zipLeftover xs ys
+loopOverList :: [a] -> [a] -> [a]
+loopOverList []     []     = []
+loopOverList xs     []     = xs
+loopOverList []     ys     = ys
+loopOverList (x:xs) (y:ys) = loopOverList xs ys
 
-lastN :: Int -> [a] -> [a]
-lastN n xs = zipLeftover (drop n xs) xs
+extractLastN :: Int -> [a] -> [a]
+extractLastN n xs = loopOverList (drop n xs) xs
 
 
 helper1 tag idx memory oldCache bitsNum = 
